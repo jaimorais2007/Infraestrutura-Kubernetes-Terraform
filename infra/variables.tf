@@ -27,3 +27,9 @@ variable "aws_region" {
   type        = string
   default     = "us-east-1"
 }
+
+variable "app_base_url" {
+  description = "URL pública (IP do EC2) onde a aplicação principal (oficina-mecanica-api) está exposta via Service LoadBalancer do k3s na porta 80"
+  type        = string
+  default     = "http://52.204.203.192"
+}

@@ -1,20 +1,20 @@
 data "terraform_remote_state" "auth" {
   backend = "s3"
   config = {
-    bucket = "meu-bucket-terraform-state"
+    bucket = "techchallenge-terraform-state-s3"
     key    = "auth-service/terraform.tfstate"
     region = "us-east-1"
   }
 }
 
 resource "aws_apigatewayv2_api" "main" {
-  name          = "oficina-mecanica-auth-api"
+  name          = "oficina-mecanica-api"
   protocol_type = "HTTP"
 
   cors_configuration {
     allow_origins = ["*"]
-    allow_methods = ["POST"]
-    allow_headers = ["content-type"]
+    allow_methods = ["GET", "POST", "PUT", "DELETE"]
+    allow_headers = ["content-type", "authorization"]
   }
 }
 
