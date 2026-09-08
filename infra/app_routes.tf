@@ -60,6 +60,9 @@ locals {
     vehicles_update           = { method = "PUT", path = "/api/Vehicle/{id}" }
     vehicles_logical_deletion = { method = "PUT", path = "/api/Vehicle/{id}/LogicalDeletion" }
     vehicles_delete           = { method = "DELETE", path = "/api/Vehicle/{id}" }
+
+    health  = { method = "GET", path = "/health" }
+    swagger = { method = "GET", path = "/swagger" }
   }
 }
 
@@ -79,6 +82,23 @@ resource "aws_apigatewayv2_route" "app" {
   api_id    = aws_apigatewayv2_api.main.id
   route_key = "${each.value.method} ${each.value.path}"
   target    = "integrations/${aws_apigatewayv2_integration.app[each.key].id}"
+}
+
+# O Swagger UI (Swashbuckle) serve varios assets estaticos sob /swagger/* (index.html,
+# swagger-ui.css, swagger-ui-bundle.js, /swagger/v1/swagger.json, etc.) - em vez de
+# listar cada arquivo, uma unica rota com {proxy+} repassa qualquer sub-caminho.
+resource "aws_apigatewayv2_integration" "swagger_assets" {
+  api_id                 = aws_apigatewayv2_api.main.id
+  integration_type       = "HTTP_PROXY"
+  integration_method     = "GET"
+  integration_uri        = "${var.app_base_url}/swagger/{proxy}"
+  payload_format_version = "1.0"
+}
+
+resource "aws_apigatewayv2_route" "swagger_assets" {
+  api_id    = aws_apigatewayv2_api.main.id
+  route_key = "GET /swagger/{proxy+}"
+  target    = "integrations/${aws_apigatewayv2_integration.swagger_assets.id}"
 }
 
 # HTTP_PROXY sem VPC Link (VPC Link tem custo por hora e foge do free tier) chama o
