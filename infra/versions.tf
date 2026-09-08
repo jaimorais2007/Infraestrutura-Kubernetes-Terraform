@@ -1,6 +1,16 @@
 terraform {
   required_version = ">= 1.5.0"
 
+  # State remoto: a instancia EC2 e o security group reais (importados) precisam do
+  # mesmo state em qualquer lugar que este repo for aplicado (ex.: de dentro da propria
+  # EC2 via SSH) - com backend local, um clone novo comecaria com state vazio e tentaria
+  # criar uma instancia/SG duplicados.
+  backend "s3" {
+    bucket = "techchallenge-terraform-state-s3"
+    key    = "gateway/terraform.tfstate"
+    region = "us-east-1"
+  }
+
   required_providers {
     kubernetes = {
       source  = "hashicorp/kubernetes"

@@ -9,6 +9,12 @@ e expõe o PostgreSQL do `docker-compose` dentro do cluster (`infra/cluster.tf`,
 > reais da instância (`aws ec2 describe-instances`) para que `terraform plan` fique
 > `0 to destroy` — não remova esses recursos do `.tf` sem antes rodar `terraform state rm`,
 > ou o Terraform vai tentar destruir a instância/security group reais.
+>
+> O state fica no S3 (`techchallenge-terraform-state-s3`, chave `gateway/terraform.tfstate`,
+> `infra/versions.tf`) — **não** local. Isso é necessário porque este repositório pode ser
+> aplicado tanto de uma máquina local quanto de dentro da própria instância EC2 (via SSH),
+> e com backend local um clone novo começaria com state vazio e tentaria criar uma
+> instância/security group duplicados.
 
 ## API Gateway
 
