@@ -8,6 +8,8 @@ resource "null_resource" "ensure_k3s_running" {
   }
 
   provisioner "local-exec" {
-    command = "sudo ${path.module}/scripts/install_k3s.sh"
+    # Invocado via "bash" (em vez de exec direto) para nao depender do bit de
+    # execucao do arquivo sobreviver a um `git clone` novo.
+    command = "sudo bash ${path.module}/scripts/install_k3s.sh"
   }
 }
