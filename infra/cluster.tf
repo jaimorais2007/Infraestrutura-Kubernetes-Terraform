@@ -1,13 +1,13 @@
-# Provisiona o cluster Kubernetes local (k3s). Reaproveita scripts/install-k3s.sh,
-# que instala o k3s se necessario, ajusta a permissao do kubeconfig e aguarda o node
-# ficar Ready. Roda a cada apply para garantir que o cluster esteja de pe (idempotente).
+# Provisiona o cluster Kubernetes local (k3s). Reaproveita infra/scripts/install_k3s.sh
+# (dentro deste proprio modulo, nao no repo_root da aplicacao), que instala o k3s se
+# necessario e ajusta a permissao do kubeconfig. Roda a cada apply para garantir que o
+# cluster esteja de pe (idempotente).
 resource "null_resource" "ensure_k3s_running" {
   triggers = {
     always_run = timestamp()
   }
 
   provisioner "local-exec" {
-    working_dir = var.repo_root
-    command     = "sudo ./scripts/install-k3s.sh"
+    command = "sudo ${path.module}/scripts/install_k3s.sh"
   }
 }
