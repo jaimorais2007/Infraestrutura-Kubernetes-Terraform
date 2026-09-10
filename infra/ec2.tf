@@ -14,7 +14,7 @@ data "aws_subnet" "app_server" {
 
 resource "aws_instance" "app_server" {
   ami           = local.ami
-  instance_type = "t3.medium"
+  instance_type = "t3.large"
   subnet_id     = local.subnet_id
   key_name      = "key_ssh_aws"
 
