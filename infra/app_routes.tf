@@ -8,8 +8,6 @@
 # igual na rota e na integration_uri).
 locals {
   app_routes = {
-    auth_login = { method = "POST", path = "/api/auth/login" }
-
     customers_list             = { method = "GET", path = "/api/Customer" }
     customers_get              = { method = "GET", path = "/api/Customer/{id}" }
     customers_create           = { method = "POST", path = "/api/Customer" }
@@ -64,6 +62,10 @@ locals {
     health  = { method = "GET", path = "/health" }
     swagger = { method = "GET", path = "/swagger" }
   }
+
+  # Rotas que continuam publicas mesmo com o authorizer configurado (health check e
+  # documentacao Swagger nao carregam dados de cliente).
+  public_app_routes = ["health", "swagger"]
 }
 
 resource "aws_apigatewayv2_integration" "app" {
@@ -82,6 +84,9 @@ resource "aws_apigatewayv2_route" "app" {
   api_id    = aws_apigatewayv2_api.main.id
   route_key = "${each.value.method} ${each.value.path}"
   target    = "integrations/${aws_apigatewayv2_integration.app[each.key].id}"
+
+  authorization_type = contains(local.public_app_routes, each.key) ? "NONE" : "CUSTOM"
+  authorizer_id      = contains(local.public_app_routes, each.key) ? null : aws_apigatewayv2_authorizer.jwt.id
 }
 
 # O Swagger UI (Swashbuckle) serve varios assets estaticos sob /swagger/* (index.html,
